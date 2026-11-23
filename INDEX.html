@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Estudio Interactiva - Niveles del Lenguaje</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        montano: {
+                            blue: '#1269A8',
+                            yellow: '#F7D615',
+                            teal: '#54887D',
+                            lightblue: '#88B5C7',
+                            olive: '#A6B046',
+                            bg: '#F2F5E9'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a232a;
+            color: #2d3748;
+        }
+        .board-frame {
+            background-color: #1269A8;
+            border: 12px solid #F7D615;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .tab-btn.active {
+            background-color: #F2F5E9;
+            color: #1269A8;
+            border-bottom: 4px solid #F7D615;
+            font-weight: 700;
+        }
+        .tab-btn {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-btn:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .solution-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+        }
+        .solution-container.open {
+            max-height: 1000px;
+            opacity: 1;
+            transition: max-height 0.5s ease-in, opacity 0.4s ease-in;
+        }
+        .board-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .board-content::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+        .board-content::-webkit-scrollbar-thumb {
+            background: #54887D;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-2 md:p-6 flex justify-center items-center">
+
+    <!-- MAIN BOARD CONTAINER -->
+    <div id="boardContainer" class="board-frame w-full max-w-6xl rounded-2xl overflow-hidden flex flex-col min-h-[90vh]">
+        
+        <!-- BOARD HEADER -->
+        <header class="bg-montano-blue p-4 flex flex-wrap justify-between items-center gap-4 border-b-2 border-montano-yellow">
+            <div class="flex items-center gap-4">
+                <!-- Logo Colegio Montano -->
+                <div class="bg-white p-1.5 rounded-lg shadow-md flex items-center justify-center">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyEop0yf6lZ7Jk9MILZxF1rBj4Oqs5esyhIQ&s" alt="Logo Colegio Montano" class="h-10 md:h-12 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/150x50/1269A8/FFFFFF?text=Colegio+Montano'">
+                </div>
+                <div>
+                    <h1 class="text-white text-lg md:text-2xl font-bold tracking-wide">COLEGIO MONTANO</h1>
+                    <p class="text-montano-yellow text-xs md:text-sm font-semibold">Guía de Estudio Interactiva | 5to Primaria</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <span class="bg-montano-teal text-white text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider hidden sm:inline-block">
+                    Comunicación y Lenguaje (Prof. Cecilia Mendoza)
+                </span>
+                <!-- Fullscreen Button -->
+                <button onclick="toggleFullscreen()" class="bg-montano-yellow hover:bg-yellow-400 text-montano-blue font-bold px-3 py-2 rounded-lg shadow-md flex items-center gap-2 text-sm transition-transform active:scale-95">
+                    <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
+                    <span id="fullscreenText" class="hidden md:inline">Pantalla Completa</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- TOP NAVIGATION TABS -->
+        <nav class="bg-montano-blue px-4 pt-2 flex flex-wrap gap-1 md:gap-2 border-b border-white/20">
+            <button onclick="switchTab('teoria')" id="tab-teoria" class="tab-btn active px-4 py-2.5 rounded-t-xl font-medium text-xs md:text-sm flex items-center gap-2">
+                <i class="fa-solid fa-book-open"></i> 1. Teoría
+            </button>
+            <button onclick="switchTab('ejemplos')" id="tab-ejemplos" class="tab-btn px-4 py-2.5 rounded-t-xl font-medium text-xs md:text-sm flex items-center gap-2">
+                <i class="fa-solid fa-lightbulb"></i> 2. Ejemplos (15)
+            </button>
+            <button onclick="switchTab('ejercicios')" id="tab-ejercicios" class="tab-btn px-4 py-2.5 rounded-t-xl font-medium text-xs md:text-sm flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square"></i> 3. Ejercicios (15)
+            </button>
+            <button onclick="switchTab('reflexion')" id="tab-reflexion" class="tab-btn px-4 py-2.5 rounded-t-xl font-medium text-xs md:text-sm flex items-center gap-2">
+                <i class="fa-solid fa-brain"></i> 4. Reflexión Crítica
+            </button>
+            <button onclick="switchTab('evaluacion')" id="tab-evaluacion" class="tab-btn px-4 py-2.5 rounded-t-xl font-medium text-xs md:text-sm flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-check"></i> 5. Evaluación Formativa
+            </button>
+        </nav>
+
+        <!-- BOARD WORKSPACE / CANVAS CONTENT -->
+        <main class="bg-montano-bg p-4 md:p-8 flex-1 overflow-y-auto board-content max-h-[75vh]">
+            
+            <!-- SECTION 1: TEORÍA -->
+            <section id="sec-teoria" class="space-y-6">
+                <div class="border-l-8 border-montano-blue pl-4 py-1">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-montano-blue">Niveles del Lenguaje</h2>
+                    <p class="text-gray-600 text-sm md:text-base">Descubre cómo adaptamos nuestra forma de hablar y escribir según el lugar, las personas y la intención comunicativa.</p>
+                </div>
+
+                <!-- CARDS DE LOS NIVELES -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- 1. Coloquial -->
+                    <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-montano-blue flex flex-col justify-between">
+                        <div>
+                            <div class="text-montano-blue text-3xl mb-2"><i class="fa-solid fa-comments font-bold"></i></div>
+                            <h3 class="font-bold text-lg text-montano-blue mb-2">1. Nivel Coloquial</h3>
+                            <p class="text-sm text-gray-700 leading-relaxed mb-3">
+                                Es el lenguaje cotidiano, espontáneo y natural que usamos con la familia, amigos o compañeros en situaciones informales.
+                            </p>
+                            <ul class="text-xs text-gray-600 space-y-1.5 list-disc pl-4">
+                                <li>Expresiones relajadas e informales.</li>
+                                <li>Uso de modismos o muletillas familiares.</li>
+                                <li>Cercano y afectivo.</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 bg-montano-lightblue/20 p-2.5 rounded-lg text-xs font-semibold text-montano-blue border border-montano-lightblue/40">
+                            Ejemplo: <em>"¡Hola, cuate! Nos vemos al rato para echar una chamusca."</em>
+                        </div>
+                    </div>
+
+                    <!-- 2. Técnico -->
+                    <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-montano-teal flex flex-col justify-between">
+                        <div>
+                            <div class="text-montano-teal text-3xl mb-2"><i class="fa-solid fa-microscope"></i></div>
+                            <h3 class="font-bold text-lg text-montano-teal mb-2">2. Nivel Técnico / Científico</h3>
+                            <p class="text-sm text-gray-700 leading-relaxed mb-3">
+                                Es un lenguaje preciso, objetivo y especializado utilizado por profesionales, científicos o en materias escolares particulares.
+                            </p>
+                            <ul class="text-xs text-gray-600 space-y-1.5 list-disc pl-4">
+                                <li>Vocabulario exacto (tecnicismos).</li>
+                                <li>Busca informar sin ambigüedades.</li>
+                                <li>Usado en ciencias, medicina, tecnología, etc.</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 bg-montano-teal/10 p-2.5 rounded-lg text-xs font-semibold text-montano-teal border border-montano-teal/30">
+                            Ejemplo: <em>"La fotosíntesis transforma la energía lumínica en glucosa mediante la clorofila."</em>
+                        </div>
+                    </div>
+
+                    <!-- 3. Literario -->
+                    <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-montano-olive flex flex-col justify-between">
+                        <div>
+                            <div class="text-montano-olive text-3xl mb-2"><i class="fa-solid fa-feather-pointed"></i></div>
+                            <h3 class="font-bold text-lg text-montano-olive mb-2">3. Nivel Literario</h3>
+                            <p class="text-sm text-gray-700 leading-relaxed mb-3">
+                                Es un lenguaje artístico y expresivo utilizado en cuentos, poemas y novelas para embellecer el mensaje y generar emociones.
+                            </p>
+                            <ul class="text-xs text-gray-600 space-y-1.5 list-disc pl-4">
+                                <li>Uso de figuras literarias (metáforas, comparaciones).</li>
+                                <li>Busca la belleza visual y sonora.</li>
+                                <li>Expresa emociones y creatividad.</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 bg-montano-olive/10 p-2.5 rounded-lg text-xs font-semibold text-montano-olive border border-montano-olive/30">
+                            Ejemplo: <em>"Sus lágrimas caían como diminutas perlas del cielo desierto."</em>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CUADRO COMPARATIVO -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 mt-6">
+                    <h3 class="font-bold text-xl text-montano-blue mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-montano-yellow"></i> ¿Cómo elegir el nivel adecuado?
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs md:text-sm text-left text-gray-700">
+                            <thead class="text-xs text-white uppercase bg-montano-blue">
+                                <tr>
+                                    <th class="py-3 px-4 rounded-tl-lg">Nivel</th>
+                                    <th class="py-3 px-4">¿Cuándo se usa?</th>
+                                    <th class="py-3 px-4">Características Clave</th>
+                                    <th class="py-3 px-4 rounded-tr-lg">Intención Principal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b bg-gray-50">
+                                    <td class="py-3 px-4 font-bold text-montano-blue">Coloquial</td>
+                                    <td class="py-3 px-4">En el recreo, en casa, chateando con amigos.</td>
+                                    <td class="py-3 px-4">Sencillo, rápido, cotidiano, expresivo.</td>
+                                    <td class="py-3 px-4">Comunicación informal diaria.</td>
+                                </tr>
+                                <tr class="border-b bg-white">
+                                    <td class="py-3 px-4 font-bold text-montano-teal">Técnico</td>
+                                    <td class="py-3 px-4">En libros de texto, exposiciones de ciencia, informes.</td>
+                                    <td class="py-3 px-4">Términos específicos, objetivo, directo.</td>
+                                    <td class="py-3 px-4">Explicar datos y conocimientos exactos.</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="py-3 px-4 font-bold text-montano-olive">Literario</td>
+                                    <td class="py-3 px-4">En fábulas, poemas, novelas y obras teatrales.</td>
+                                    <td class="py-3 px-4">Uso de imaginación, metáforas y belleza.</td>
+                                    <td class="py-3 px-4">Crear arte verbal y emocionar al lector.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: EJEMPLOS RESUELTOS (15) -->
+            <section id="sec-ejemplos" class="hidden space-y-6">
+                <div class="border-l-8 border-montano-yellow pl-4 py-1">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-montano-blue">Ejemplos Resueltos</h2>
+                    <p class="text-gray-600 text-sm">15 ejemplos analizados según el nivel del lenguaje y su intención.</p>
+                </div>
+
+                <!-- NIVEL BÁSICO -->
+                <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-montano-olive text-white font-bold text-xs px-3 py-1 rounded-full">Nivel Básico</span>
+                        <h3 class="font-bold text-lg text-gray-800">Identificación directa de cada nivel</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs md:text-sm">
+                        <div class="bg-montano-bg p-3 rounded-lg border border-gray-300">
+                            <strong>Ejemplo 1:</strong> "Oye, pásame la pelota que ya nos toca jugar."<br>
+                            <span class="text-montano-blue font-semibold">Respuesta:</span> Nivel Coloquial. Uso cotidiano en una conversación informal.
+                        </div>
+                        <div class="bg-montano-bg p-3 rounded-lg border border-gray-300">
+                            <strong>Ejemplo 2:</strong> "El triángulo equilátero tiene tres lados congruentes."<br>
+                            <span class="text-montano-teal font-semibold">Respuesta:</span> Nivel Técnico. Utiliza el término geométrico "congruente" (iguales).
+                        </div>
+                        <div class="bg-montano-bg p-3 rounded-lg border border-gray-300">
+                            <strong>Ejemplo 3:</strong> "El sol dorado peinaba los cabellos del prado florecido."<br>
+                            <span class="text-montano-olive font-semibold">Respuesta:</span> Nivel Literario. Emplea la personificación artística del sol.
+                        </div>
+                        <div class="bg-montano-bg p-3 rounded-lg border border-gray-300">
+                            <strong>Ejemplo 4:</strong> "¡Pilas con la tarea de mate para mañana, mucha!"<br>
+                            <span class="text-montano-blue font-semibold">Respuesta:</span> Nivel Coloquial. Incluye modismos típicos de la conversación informal.
+                        </div>
+                        <div class="bg-montano-bg p-3 rounded-lg border border-gray-300">
+                            <strong>Ejemplo 5:</strong> "El disco duro almacena datos de forma no volátil."<br>
+                            <span class="text-montano-teal font-semibold">Respuesta:</span> Nivel Técnico. Usa términos computacionales específicos.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NIVEL INTERMEDIO -->
+                <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-montano-teal text-white font-bold text-xs px-3 py-1 rounded-full">Nivel Intermedio</span>
+                        <h3 class="font-bold text-lg text-gray-800">Comparación del mismo tema en los 3 niveles</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs md:text-sm">
+                        <!-- Caso El Corazón -->
+                        <div class="bg-montano-lightblue/10 p-3 rounded-lg border border-montano-lightblue space-y-1">
+                            <span class="font-bold text-montano-blue">Tema: El Corazón</span>
+                            <p><strong>Ex 6 (Coloquial):</strong> "Me palpita bien rápido el corazón de tanto correr."</p>
+                            <p><strong>Ex 7 (Técnico):</strong> "El miocardio es el tejido muscular del corazón responsable de bombear sangre."</p>
+                            <p><strong>Ex 8 (Literario):</strong> "Su corazón era un tambor salvaje marcando el ritmo del miedo."</p>
+                        </div>
+
+                        <!-- Caso La Lluvia -->
+                        <div class="bg-montano-lightblue/10 p-3 rounded-lg border border-montano-lightblue space-y-1">
+                            <span class="font-bold text-montano-blue">Tema: La Lluvia</span>
+                            <p><strong>Ex 9 (Coloquial):</strong> "¡Qué gran choconoy de agua está cayendo afuera!"</p>
+                            <p><strong>Ex 10 (Técnico):</strong> "La precipitación pluvial se mide utilizando un pluviómetro."</p>
+                            <p><strong>Ex 11 (Literario):</strong> "El cielo lloraba diminutas gotas de cristal sobre la ciudad gris."</p>
+                        </div>
+
+                        <!-- Caso El Sueño -->
+                        <div class="bg-montano-lightblue/10 p-3 rounded-lg border border-montano-lightblue space-y-1">
+                            <span class="font-bold text-montano-blue">Tema: El Sueño/Dormir</span>
+                            <p><strong>Ex 12 (Coloquial):</strong> "Tengo un sueño increíble, me voy a echar una mi pestaña."</p>
+                            <p><strong>Ex 13 (Técnico):</strong> "Durante la fase REM del sueño se produce la mayor actividad cerebral."</p>
+                            <p><strong>Ex 14 (Literario):</strong> "La noche envolvió sus pensamientos en un manto de dulce olvido."</p>
+                        </div>
+                    </div>
+                    <div class="mt-3 bg-montano-bg p-3 rounded border border-gray-300 text-xs">
+                        <strong>Ejemplo 15 (Análisis Avanzado):</strong> Una receta que dice <em>"Sazona con una pizca de sal"</em> combina lenguaje coloquial/instructivo, pero si un chef dice <em>"Añadir 5 gramos de cloruro de sodio"</em> cambia inmediatamente a <strong>Nivel Técnico</strong>.
+                    </div>
+                </div>
+
+                <!-- NIVEL AVANZADO -->
+                <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-montano-blue text-white font-bold text-xs px-3 py-1 rounded-full">Nivel Avanzado</span>
+                        <h3 class="font-bold text-lg text-gray-800">Transformación y combinación de los 3 niveles</h3>
+                    </div>
+                    <p class="text-xs text-gray-600 mb-3">En estos casos avanzados, observamos cómo una misma idea cambia totalmente según la intención comunicativa:</p>
+                    <div class="space-y-2 text-xs md:text-sm">
+                        <div class="bg-montano-blue/5 p-3 rounded-lg border border-montano-blue/30">
+                            <strong class="text-montano-blue">Idea base: "Ver televisión por muchas horas"</strong>
+                            <ul class="list-disc pl-5 mt-1 space-y-1">
+                                <li><strong>Coloquial:</strong> "Llevas todo el día pegado a la tele como chicle."</li>
+                                <li><strong>Técnico:</strong> "El consumo prolongado de pantallas genera fatiga visual e insomnio."</li>
+                                <li><strong>Literario:</strong> "La pantalla encendida devoraba las horas doradas de su juventud."</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: EJERCICIOS PRÁCTICOS (15) -->
+            <section id="sec-ejercicios" class="hidden space-y-6">
+                <div class="border-l-8 border-montano-teal pl-4 py-1">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-montano-blue">Ejercicios Prácticos</h2>
+                    <p class="text-gray-600 text-sm">Resuelve los siguientes ejercicios para dominar la diferencia entre los niveles del lenguaje.</p>
+                </div>
+
+                <!-- BÁSICO (5) -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold text-montano-olive flex items-center gap-2">
+                        <i class="fa-solid fa-seedling"></i> Nivel Básico (Clasificación Directa)
+                    </h3>
+                    
+                    <!-- Ex 1 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">1. Clasifica el nivel del lenguaje: "Los felinos domésticos pertenecen a la familia Felidae y son carnívoros estrictos."</p>
+                        <button onclick="toggleSolution('sol-ex-1')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-1" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Es de <strong>Nivel Técnico</strong>. Emplea la taxonomía científica ("Felidae") y términos zoológicos precisos.
+                        </div>
+                    </div>
+
+                    <!-- Ex 2 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">2. Clasifica el nivel del lenguaje: "¡Qué onda, mano! ¿Vienes mañana al colegio?"</p>
+                        <button onclick="toggleSolution('sol-ex-2')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-2" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Es de <strong>Nivel Coloquial</strong>. Expresión informal con modismos guatemaltecos.
+                        </div>
+                    </div>
+
+                    <!-- Ex 3 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">3. Clasifica el nivel del lenguaje: "Sus ojos eran dos luceros iluminando la penumbra del bosque."</p>
+                        <button onclick="toggleSolution('sol-ex-3')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-3" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Es de <strong>Nivel Literario</strong>. Utiliza una metáfora ("dos luceros") para describir la mirada.
+                        </div>
+                    </div>
+
+                    <!-- Ex 4 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">4. ¿En qué nivel del lenguaje está escrito un libro de texto de Ciencias Naturales sobre las células?</p>
+                        <button onclick="toggleSolution('sol-ex-4')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-4" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Está en <strong>Nivel Técnico</strong> porque busca enseñar términos exactos y científicos.
+                        </div>
+                    </div>
+
+                    <!-- Ex 5 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">5. ¿Qué nivel utilizas al enviar un mensaje de texto rápido a tu mamá avisando que saliste de clase?</p>
+                        <button onclick="toggleSolution('sol-ex-5')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-5" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Utilizas el <strong>Nivel Coloquial</strong>, por ser una comunicación rápida y familiar.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTERMEDIO (5) -->
+                <div class="space-y-4 mt-6">
+                    <h3 class="text-lg font-bold text-montano-teal flex items-center gap-2">
+                        <i class="fa-solid fa-tree"></i> Nivel Intermedio (Reescritura y Adaptación)
+                    </h3>
+
+                    <!-- Ex 6 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">6. Reescribe la oración coloquial "Tengo mucha hambre" al Nivel Literario.</p>
+                        <button onclick="toggleSolution('sol-ex-6')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-6" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Ejemplo de solución:</strong> <em>"Un león insaciable ruge en el vacío de mi estómago."</em>
+                        </div>
+                    </div>
+
+                    <!-- Ex 7 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">7. Convierte esta oración técnica a un Nivel Coloquial: "Se registra una elevada temperatura ambiental."</p>
+                        <button onclick="toggleSolution('sol-ex-7')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-7" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Ejemplo de solución:</strong> <em>"¡Está haciendo un gran calorón hoy!"</em>
+                        </div>
+                    </div>
+
+                    <!-- Ex 8 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">8. Identifica qué palabras convierten esta oración en Nivel Técnico: "El ángulo obtuso mide más de 90 grados y menos de 180."</p>
+                        <button onclick="toggleSolution('sol-ex-8')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-8" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Las palabras clave son <strong>"ángulo obtuso"</strong> y las unidades exactas de grados (<strong>"90° y 180°"</strong>).
+                        </div>
+                    </div>
+
+                    <!-- Ex 9 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">9. Lee este poema: "Canta el río entre las piedras su canción de libertad." ¿A qué nivel pertenece y qué figura usa?</p>
+                        <button onclick="toggleSolution('sol-ex-9')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-9" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Pertenece al <strong>Nivel Literario</strong>. Le otorga la acción humana de "cantar" al río (personificación).
+                        </div>
+                    </div>
+
+                    <!-- Ex 10 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">10. ¿Qué nivel de lenguaje debe predominar durante una exposición formal ante los jueces de la Feria Científica del Colegio Montano?</p>
+                        <button onclick="toggleSolution('sol-ex-10')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-10" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> El <strong>Nivel Técnico</strong> (o formal), ya que requiere demostrar vocabulario académico preciso sobre el experimento.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AVANZADO (5) -->
+                <div class="space-y-4 mt-6">
+                    <h3 class="text-lg font-bold text-montano-blue flex items-center gap-2">
+                        <i class="fa-solid fa-mountain"></i> Nivel Avanzado (Análisis Crítico)
+                    </h3>
+
+                    <!-- Ex 11 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">11. Un médico habla con su colega usando términos como "cefalea aguda" y luego le dice al niño paciente: "Tienes un dolorcito de cabeza". ¿Por qué cambió de nivel?</p>
+                        <button onclick="toggleSolution('sol-ex-11')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-11" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Cambió de Nivel Técnico a Coloquial para que su receptor (el niño) comprenda el mensaje de forma cercana y sin asustarse.
+                        </div>
+                    </div>
+
+                    <!-- Ex 12 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">12. Analiza esta frase: "El astro rey derramaba su luz sobre el cloroplasto de las plantas". ¿Por qué es una mezcla incorrecta de niveles?</p>
+                        <button onclick="toggleSolution('sol-ex-12')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-12" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Mezcla el Nivel Literario ("astro rey derramaba") con un tecnicismo estricto ("cloroplasto"). Para ser coherente, debe ser totalmente poético o totalmente científico.
+                        </div>
+                    </div>
+
+                    <!-- Ex 13 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">13. Convierte el fenómeno de la "Evaporación del agua" a los tres niveles del lenguaje en un mismo párrafo interactivo.</p>
+                        <button onclick="toggleSolution('sol-ex-13')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-13" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong><br>
+                            - <strong>Coloquial:</strong> "Se secó el charco por el gran solazo."<br>
+                            - <strong>Técnico:</strong> "El agua líquida pasó a estado gaseoso al elevarse la temperatura."<br>
+                            - <strong>Literario:</strong> "El agua se transformó en invisibles alas de vapor para viajar hacia el cielo."
+                        </div>
+                    </div>
+
+                    <!-- Ex 14 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">14. ¿Qué ocurre con la comunicación si un científico presenta una conferencia ante niños de 5to Primaria usando solo términos técnicos indescifrables?</p>
+                        <button onclick="toggleSolution('sol-ex-14')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-14" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> Se produce una <strong>barrera en la comunicación</strong>. La audiencia se aburrirá y no captará la idea principal porque el nivel no estuvo adaptado a los receptores.
+                        </div>
+                    </div>
+
+                    <!-- Ex 15 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <p class="text-sm font-semibold text-gray-800">15. Crea una comparación entre un mensaje de texto publicitario (coloquial) y el manual de usuario de una tableta (técnico).</p>
+                        <button onclick="toggleSolution('sol-ex-15')" class="mt-2 text-xs bg-montano-blue text-white px-3 py-1.5 rounded hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ex-15" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta:</strong> La publicidad usa expresiones emocionales y atractivas (<em>"¡Llévate tu tablet ya, está rebuena!"</em>), mientras que el manual usa instrucciones directas y precisas (<em>"Presione el botón de encendido por 3 segundos para reiniciar el sistema operativo"</em>).
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: PREGUNTAS DE REFLEXIÓN CRÍTICA -->
+            <section id="sec-reflexion" class="hidden space-y-6">
+                <div class="border-l-8 border-montano-olive pl-4 py-1">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-montano-blue">Reflexión Crítica y Pensamiento Lógico</h2>
+                    <p class="text-gray-600 text-sm">Cuestionamientos abiertos para debatir en clase y analizar cómo nos comunicamos.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-montano-blue space-y-3">
+                        <div class="text-montano-blue text-2xl"><i class="fa-solid fa-comments"></i></div>
+                        <h3 class="font-bold text-lg text-montano-blue">1. Adaptación al Contexto</h3>
+                        <p class="text-sm text-gray-700 leading-relaxed">
+                            ¿Crees que existe un nivel de lenguaje que sea "mejor" que los demás, o depende totalmente del lugar, las personas y el momento en que nos encontremos? Fundamenta tu respuesta con un ejemplo personal.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-montano-yellow space-y-3">
+                        <div class="text-montano-yellow text-2xl"><i class="fa-solid fa-pen-nib"></i></div>
+                        <h3 class="font-bold text-lg text-gray-800">2. Emoción vs. Datos Exactos</h3>
+                        <p class="text-sm text-gray-700 leading-relaxed">
+                            Imagina que quieres convencer a la comunidad escolar de cuidar el agua. ¿Usarías datos técnicos sobre los litros malgastados o un cuento emotivo con lenguaje literario? ¿Cómo los combinarías?
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-montano-teal space-y-3">
+                        <div class="text-montano-teal text-2xl"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <h3 class="font-bold text-lg text-montano-teal">3. El Valor de Aprender Vocabulario Técnico</h3>
+                        <p class="text-sm text-gray-700 leading-relaxed">
+                            ¿Por qué es importante para un estudiante de 5to Primaria aprender palabras técnicas en asignaturas como Ciencias o Matemáticas, en lugar de usar siempre explicaciones sencillas o coloquiales?
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-montano-olive space-y-3">
+                        <div class="text-montano-olive text-2xl"><i class="fa-solid fa-book-bookmark"></i></div>
+                        <h3 class="font-bold text-lg text-montano-olive">4. Creatividad en la Vida Diaria</h3>
+                        <p class="text-sm text-gray-700 leading-relaxed">
+                            ¿De qué manera el lenguaje literario puede ayudarnos a expresar sentimientos complejos como la tristeza, la alegría o la amistad mejor que una frase común del día a día?
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: EVALUACIÓN FORMATIVA CON SOLUCIONES OCULTAS -->
+            <section id="sec-evaluacion" class="hidden space-y-6">
+                <div class="border-l-8 border-montano-blue pl-4 py-1">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-montano-blue">Evaluación Formativa</h2>
+                    <p class="text-gray-600 text-sm">Evalúa tus aprendizajes sobre los niveles Coloquial, Técnico y Literario.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Pregunta 1 -->
+                    <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                        <span class="text-xs bg-montano-blue/10 text-montano-blue font-bold px-2.5 py-1 rounded">Pregunta 1 - Selección Múltiple</span>
+                        <p class="text-sm font-semibold text-gray-800 mt-2">
+                            ¿Cuál de los siguientes enunciados se encuentra en **Nivel Técnico**?
+                        </p>
+                        <div class="mt-2 text-xs text-gray-600 space-y-1">
+                            <div>a) "Ese patojo corre tan rápido como el viento."</div>
+                            <div>b) "El proceso de digestión inicia en la cavidad bucal mediante enzimas salivales."</div>
+                            <div>c) "Me voy a ir a dormir porque ya no aguanto el cansancio."</div>
+                        </div>
+                        <button onclick="toggleSolution('sol-ev-1')" class="mt-3 text-xs bg-montano-teal text-white px-3 py-1.5 rounded hover:bg-teal-700 transition">
+                            <i class="fa-solid fa-check"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ev-1" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta Correcta: B.</strong> Utiliza vocabulario anatómico y científico exacto ("cavidad bucal", "enzimas salivales").
+                        </div>
+                    </div>
+
+                    <!-- Pregunta 2 -->
+                    <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                        <span class="text-xs bg-montano-blue/10 text-montano-blue font-bold px-2.5 py-1 rounded">Pregunta 2 - Identificación de Texto</span>
+                        <p class="text-sm font-semibold text-gray-800 mt-2">
+                            Lee el fragmento: <em>"La luna, plateada guardiana de los mares, velaba el sueño de los marineros."</em> ¿A qué nivel del lenguaje pertenece y qué intención tiene?
+                        </p>
+                        <button onclick="toggleSolution('sol-ev-2')" class="mt-3 text-xs bg-montano-teal text-white px-3 py-1.5 rounded hover:bg-teal-700 transition">
+                            <i class="fa-solid fa-check"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ev-2" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Respuesta Correcta:</strong> Pertenece al <strong>Nivel Literario</strong>. Su intención es poética, buscando embellecer la figura de la luna mediante personificación y metáfora.
+                        </div>
+                    </div>
+
+                    <!-- Pregunta 3 -->
+                    <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                        <span class="text-xs bg-montano-blue/10 text-montano-blue font-bold px-2.5 py-1 rounded">Pregunta 3 - Caso Práctico de Asociación</span>
+                        <p class="text-sm font-semibold text-gray-800 mt-2">
+                            Asocia cada situación con el nivel del lenguaje correspondiente:
+                        </p>
+                        <div class="mt-2 text-xs text-gray-700 space-y-1">
+                            <div>1. Una conversación en la cafetería del colegio.</div>
+                            <div>2. La lectura de una fábula de Esopo.</div>
+                            <div>3. El manual para instalar un programa de computadora.</div>
+                        </div>
+                        <button onclick="toggleSolution('sol-ev-3')" class="mt-3 text-xs bg-montano-teal text-white px-3 py-1.5 rounded hover:bg-teal-700 transition">
+                            <i class="fa-solid fa-check"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ev-3" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Solución Correcta:</strong><br>
+                            1. <strong>Nivel Coloquial</strong><br>
+                            2. <strong>Nivel Literario</strong><br>
+                            3. <strong>Nivel Técnico</strong>
+                        </div>
+                    </div>
+
+                    <!-- Pregunta 4 -->
+                    <div class="bg-white p-5 rounded-xl shadow border border-gray-200">
+                        <span class="text-xs bg-montano-blue/10 text-montano-blue font-bold px-2.5 py-1 rounded">Pregunta 4 - Redacción de Transformación</span>
+                        <p class="text-sm font-semibold text-gray-800 mt-2">
+                            Transforma la siguiente idea cotidiana: <em>"Está lloviendo muy fuerte"</em> en:
+                            <br>a) Una oración con lenguaje técnico.
+                            <br>b) Una oración con lenguaje literario.
+                        </p>
+                        <button onclick="toggleSolution('sol-ev-4')" class="mt-3 text-xs bg-montano-teal text-white px-3 py-1.5 rounded hover:bg-teal-700 transition">
+                            <i class="fa-solid fa-check"></i> Mostrar Solución
+                        </button>
+                        <div id="sol-ev-4" class="solution-container mt-2 text-xs bg-montano-bg p-3 rounded border border-montano-teal">
+                            <strong>Criterio de Solución:</strong><br>
+                            a) <strong>Técnico:</strong> <em>"Se registra una alta precipitación pluvial de intensos milímetros por hora."</em><br>
+                            b) <strong>Literario:</strong> <em>"El cielo desató una furiosa cascada que inundó los rincones de la tierra."</em>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-montano-blue p-3 text-center text-white text-xs border-t border-montano-yellow/50">
+            Colegio Montano &copy; 2026 - Guía Interactiva para Canvas Education | Docente: Cecilia Mendoza
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Navigation Tabs Switcher
+        function switchTab(tabId) {
+            const sections = ['teoria', 'ejemplos', 'ejercicios', 'reflexion', 'evaluacion'];
+            sections.forEach(id => {
+                const sec = document.getElementById('sec-' + id);
+                const btn = document.getElementById('tab-' + id);
+                if (sec) sec.classList.add('hidden');
+                if (btn) btn.classList.remove('active');
+            });
+
+            const activeSec = document.getElementById('sec-' + tabId);
+            const activeBtn = document.getElementById('tab-' + tabId);
+            if (activeSec) activeSec.classList.remove('hidden');
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        // Show / Hide Solutions Logic
+        function toggleSolution(solId) {
+            const solContainer = document.getElementById(solId);
+            if (!solContainer) return;
+
+            const button = solContainer.previousElementSibling;
+            
+            if (solContainer.classList.contains('open')) {
+                solContainer.classList.remove('open');
+                if (button && button.tagName === 'BUTTON') {
+                    button.innerHTML = '<i class="fa-solid fa-eye"></i> Mostrar Solución';
+                }
+            } else {
+                solContainer.classList.add('open');
+                if (button && button.tagName === 'BUTTON') {
+                    button.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ocultar Solución';
+                }
+            }
+        }
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            const container = document.getElementById('boardContainer');
+            const icon = document.getElementById('fullscreenIcon');
+            const text = document.getElementById('fullscreenText');
+
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                } else if (container.msRequestFullscreen) {
+                    container.msRequestFullscreen();
+                }
+                if (icon) icon.className = 'fa-solid fa-compress';
+                if (text) text.textContent = 'Salir Pantalla Completa';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                if (icon) icon.className = 'fa-solid fa-expand';
+                if (text) text.textContent = 'Pantalla Completa';
+            }
+        }
+
+        // Handle ESC key or fullscreen change
+        document.addEventListener('fullscreenchange', exitHandler);
+        document.addEventListener('webkitfullscreenchange', exitHandler);
+        document.addEventListener('mozfullscreenchange', exitHandler);
+        document.addEventListener('MSFullscreenChange', exitHandler);
+
+        function exitHandler() {
+            if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+                const icon = document.getElementById('fullscreenIcon');
+                const text = document.getElementById('fullscreenText');
+                if (icon) icon.className = 'fa-solid fa-expand';
+                if (text) text.textContent = 'Pantalla Completa';
+            }
+        }
+    </script>
+</body>
+</html>
